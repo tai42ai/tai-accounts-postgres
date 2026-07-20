@@ -5,17 +5,17 @@ from __future__ import annotations
 from typing import Any
 
 import pytest
-from tai_contract.access_control.identity import AuthIdentity
-from tai_contract.access_control.registry import get_identity_provider_factory
-from tai_contract.accounts import FormMethod
-from tai_contract.accounts.registry import get_accounts_provider_factory
-from tai_kit.clients.impl.postgres import PostgresClient
-from tai_kit.clients.impl.redis import RedisClient
+from tai42_contract.access_control.identity import AuthIdentity
+from tai42_contract.access_control.registry import get_identity_provider_factory
+from tai42_contract.accounts import FormMethod
+from tai42_contract.accounts.registry import get_accounts_provider_factory
+from tai42_kit.clients.impl.postgres import PostgresClient
+from tai42_kit.clients.impl.redis import RedisClient
 
-from tai_accounts_postgres import provider as provider_module
-from tai_accounts_postgres import service
-from tai_accounts_postgres.provider import PostgresAccountsProvider
-from tai_accounts_postgres.settings import accounts_settings
+from tai42_accounts_postgres import provider as provider_module
+from tai42_accounts_postgres import service
+from tai42_accounts_postgres.provider import PostgresAccountsProvider
+from tai42_accounts_postgres.settings import accounts_settings
 
 from .conftest import FakeProviderSettings, ScriptedPg, future, make_pg_ctx, past
 

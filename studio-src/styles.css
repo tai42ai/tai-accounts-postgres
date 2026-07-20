@@ -1,6 +1,6 @@
 /**
  * The plugin's own scoped stylesheet. Every rule is authored bare and the build's
- * PostCSS pass scopes it under the plugin root class (`.tai_accounts_postgres-root`),
+ * PostCSS pass scopes it under the plugin root class (`.tai42_accounts_postgres-root`),
  * so nothing here can leak into the host shell. Theme values come only from the
  * SDK design-system custom properties (`var(--tai-*)`), so the page themes itself
  * with the shell.

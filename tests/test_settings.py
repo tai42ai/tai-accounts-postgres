@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from tai_accounts_postgres import settings as settings_module
-from tai_accounts_postgres.settings import AccountsSettings
+from tai42_accounts_postgres import settings as settings_module
+from tai42_accounts_postgres.settings import AccountsSettings
 
 
 def test_redis_key_prefix_defaults_to_pg_db(monkeypatch):

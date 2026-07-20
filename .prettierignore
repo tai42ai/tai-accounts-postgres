@@ -5,4 +5,4 @@ uv.lock
 
 # The compiled Studio bundle + generated manifest (emitted by scripts/build-studio.mjs,
 # shipped inside the Python package).
-src/tai_accounts_postgres/studio/
+src/tai42_accounts_postgres/studio/

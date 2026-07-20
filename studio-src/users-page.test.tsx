@@ -71,7 +71,7 @@ afterEach(() => {
 
 describe('UsersPage', () => {
   it('lists users with their role and status', async () => {
-    render(<UsersPage pluginId="tai_accounts_postgres" />);
+    render(<UsersPage pluginId="tai42_accounts_postgres" />);
 
     expect(await screen.findByText('alice@example.com')).toBeInTheDocument();
     expect(screen.getByText('bob@example.com')).toBeInTheDocument();
@@ -82,7 +82,7 @@ describe('UsersPage', () => {
 
   it('invites a user and shows the one-time login link', async () => {
     const user = userEvent.setup();
-    render(<UsersPage pluginId="tai_accounts_postgres" />);
+    render(<UsersPage pluginId="tai42_accounts_postgres" />);
     await screen.findByText('alice@example.com');
 
     await user.click(screen.getByRole('button', { name: 'Invite user' }));
@@ -107,7 +107,7 @@ describe('UsersPage', () => {
       deleteUser: vi.fn().mockRejectedValue(new Error('Cannot delete the last enabled admin')),
     });
     const user = userEvent.setup();
-    render(<UsersPage pluginId="tai_accounts_postgres" />);
+    render(<UsersPage pluginId="tai42_accounts_postgres" />);
     await screen.findByText('alice@example.com');
 
     // Open the confirm for Alice (the first row) and confirm the delete.
@@ -122,7 +122,7 @@ describe('UsersPage', () => {
 
   it('disables a user through the confirm dialog', async () => {
     const user = userEvent.setup();
-    render(<UsersPage pluginId="tai_accounts_postgres" />);
+    render(<UsersPage pluginId="tai42_accounts_postgres" />);
     await screen.findByText('alice@example.com');
 
     // Alice is the first active row; open her disable confirm and confirm it.

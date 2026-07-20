@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import pytest
 
-from tai_accounts_postgres import hashing
-from tai_accounts_postgres.hashing import (
+from tai42_accounts_postgres import hashing
+from tai42_accounts_postgres.hashing import (
     DUMMY_HASH,
     HashCapacityError,
     HashGate,

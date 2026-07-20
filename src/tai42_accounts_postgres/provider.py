@@ -17,24 +17,24 @@ import logging
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING
 
-from tai_contract.access_control.identity import AuthIdentity, ReadinessTarget
-from tai_contract.accounts import (
+from tai42_contract.access_control.identity import AuthIdentity, ReadinessTarget
+from tai42_contract.accounts import (
     AccountsProvider,
     FormField,
     FormMethod,
     LoginMethod,
     register_accounts_provider,
 )
-from tai_kit.clients import client_ctx
-from tai_kit.clients.impl.postgres import PostgresClient
-from tai_kit.clients.impl.redis import RedisClient
+from tai42_kit.clients import client_ctx
+from tai42_kit.clients.impl.postgres import PostgresClient
+from tai42_kit.clients.impl.redis import RedisClient
 
-from tai_accounts_postgres import service
-from tai_accounts_postgres.db import declared_tables
-from tai_accounts_postgres.settings import accounts_settings
+from tai42_accounts_postgres import service
+from tai42_accounts_postgres.db import declared_tables
+from tai42_accounts_postgres.settings import accounts_settings
 
 if TYPE_CHECKING:
-    from tai_contract.accounts import AccountsProviderSettings
+    from tai42_contract.accounts import AccountsProviderSettings
 
 logger = logging.getLogger(__name__)
 
@@ -49,7 +49,7 @@ _OPEN_WINDOW_WARNING = (
     "owner; unset TAI_ACCOUNTS_BOOTSTRAP_OPEN to gate it"
 )
 _SCHEMA_MISSING = (
-    "tai-accounts-postgres schema missing: run 'python -m tai_accounts_postgres.db apply' "
+    "tai42-accounts-postgres schema missing: run 'python -m tai42_accounts_postgres.db apply' "
     "against the configured database"
 )
 
@@ -217,6 +217,6 @@ class PostgresAccountsProvider(AccountsProvider):
 # registry (methods aggregation) and the identity registry (session-token
 # resolution) under the same name — an accounts provider IS the identity answerer
 # for its own sessions, so a single registration keeps sessions mintable AND
-# validatable. No ``tai_app`` handle is involved; the plugin registers at its own
-# import so ``lifecycle_modules: ["tai_accounts_postgres"]`` triggers it.
+# validatable. No ``tai42_app`` handle is involved; the plugin registers at its own
+# import so ``lifecycle_modules: ["tai42_accounts_postgres"]`` triggers it.
 register_accounts_provider("accounts-postgres", PostgresAccountsProvider)

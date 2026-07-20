@@ -13,7 +13,7 @@
  *
  * CSS: the bundle's stylesheet import (the plugin's own `styles.css`) is emitted
  * as ONE content-hashed `.css` asset. At build time a PostCSS pass scopes EVERY
- * selector under the plugin root class (`.tai_accounts_postgres-root`) and
+ * selector under the plugin root class (`.tai42_accounts_postgres-root`) and
  * namespaces every `@keyframes` (and its `animation` references) with the plugin
  * prefix, so the host-injected stylesheet can never leak into the shell. A
  * post-build assertion re-parses the emitted asset and fails the build loudly on
@@ -40,7 +40,7 @@ const scriptDir = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(scriptDir, '..');
 const srcDir = resolve(repoRoot, 'studio-src');
 const entryFile = resolve(srcDir, 'index.tsx');
-const outDir = resolve(repoRoot, 'src', 'tai_accounts_postgres', 'studio');
+const outDir = resolve(repoRoot, 'src', 'tai42_accounts_postgres', 'studio');
 // The SDK is resolved through this repo's own install. Its published `files` list
 // ships both `dist` and `src`, so the type and version paths below resolve from
 // the registry install.
@@ -61,7 +61,7 @@ const EXTERNAL = [
 /** The plugin root class every stylesheet selector is scoped under. The plugin
  * renders this class itself on its page root; the name is prefixed with the
  * plugin's package name per the Studio styling contract. */
-const ROOT_CLASS = '.tai_accounts_postgres-root';
+const ROOT_CLASS = '.tai42_accounts_postgres-root';
 
 /** The plugin prefix stamped onto every `@keyframes` name. */
 const KEYFRAMES_PREFIX = 'tap-';
@@ -275,7 +275,7 @@ async function main() {
   const manifest = {
     // MUST equal the Python package name — the skeleton registry rejects a
     // mismatch at startup, and the bundle URL is built from this name.
-    name: 'tai_accounts_postgres',
+    name: 'tai42_accounts_postgres',
     version: readPluginVersion(),
     api_version: readApiVersion(),
     entry,
@@ -294,7 +294,7 @@ async function main() {
     throw new Error('studio-manifest.json was not written');
   }
   console.log(
-    `tai-accounts-postgres studio bundle built: ${outDir}\n  entry: ${entry}\n  api_version: ${String(manifest.api_version)}\n  files: ${Object.keys(integrity).join(', ')}`,
+    `tai42-accounts-postgres studio bundle built: ${outDir}\n  entry: ${entry}\n  api_version: ${String(manifest.api_version)}\n  files: ${Object.keys(integrity).join(', ')}`,
   );
 }
 

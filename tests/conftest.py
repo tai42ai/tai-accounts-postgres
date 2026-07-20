@@ -1,4 +1,4 @@
-"""Test seams for tai-accounts-postgres.
+"""Test seams for tai42-accounts-postgres.
 
 Three fakes stand in for the plugin's I/O:
 
@@ -12,8 +12,8 @@ Three fakes stand in for the plugin's I/O:
   ``FakeAdminServices`` — dict-backed implementations of the store and injected
   services contracts, for the provider and route tests.
 
-The contract ``tai_app`` handle is bound to a no-op fake at import so the route
-modules' ``@tai_app.http.custom_route`` decorators register cleanly under test.
+The contract ``tai42_app`` handle is bound to a no-op fake at import so the route
+modules' ``@tai42_app.http.custom_route`` decorators register cleanly under test.
 """
 
 from __future__ import annotations
@@ -58,9 +58,9 @@ class _FakeApp:
 
 _fake_app = _FakeApp()
 
-from tai_contract.app import tai_app  # noqa: E402
+from tai42_contract.app import tai42_app  # noqa: E402
 
-tai_app.bind(_fake_app)
+tai42_app.bind(_fake_app)
 
 
 # -- a psycopg-shaped seam for stores.py ----------------------------------------
@@ -257,12 +257,12 @@ class _FakeAdminGuard:
     async def delete_sessions_for_user(self, user_id: str) -> None:
         # The real guard deletes on its own connection; the fake delegates to the
         # wired sessions store so the same rows disappear.
-        from tai_accounts_postgres import service
+        from tai42_accounts_postgres import service
 
         await service.sessions_store().delete_for_user(user_id)
 
     async def delete_invites_for_user(self, user_id: str) -> None:
-        from tai_accounts_postgres import service
+        from tai42_accounts_postgres import service
 
         await service.invites_store().delete_for_user(user_id)
 
@@ -284,7 +284,7 @@ class FakeUsersStore:
 
     async def create(self, user_id: str, email: str, role: str, password_hash: str | None = None) -> str:
         if any(r["email"] == email for r in self.rows.values()):
-            from tai_accounts_postgres.stores import EmailTakenError
+            from tai42_accounts_postgres.stores import EmailTakenError
 
             raise EmailTakenError(email)
         self.rows[user_id] = {
@@ -494,8 +494,8 @@ def _isolate_registries():
     """Snapshot + restore BOTH module-level registries around each test so a
     registration (or clear) never leaks into the next. The plugin's import-time
     ``accounts-postgres`` registration is captured by the baseline snapshot."""
-    from tai_contract.access_control import registry as identity_registry
-    from tai_contract.accounts import registry as accounts_registry
+    from tai42_contract.access_control import registry as identity_registry
+    from tai42_contract.accounts import registry as accounts_registry
 
     identity_saved = dict(identity_registry._REGISTRY)
     accounts_saved = dict(accounts_registry._REGISTRY)
@@ -512,8 +512,8 @@ def _isolate_registries():
 def _reset_plugin_state():
     """Reset the settings cache, the hash gate, and the settings holder so an
     env-dependent test starts clean and never leaks into the next."""
-    from tai_accounts_postgres import hashing, service
-    from tai_accounts_postgres.settings import accounts_settings
+    from tai42_accounts_postgres import hashing, service
+    from tai42_accounts_postgres.settings import accounts_settings
 
     accounts_settings.cache_clear()
     hashing.reset_hash_gate()
@@ -548,7 +548,7 @@ def admin() -> FakeAdminServices:
 def wire(monkeypatch, users_store, sessions_store, invites_store, admin):
     """Wire the in-memory stores + injected services into the plugin and populate
     the settings holder. Returns the pieces for assertions."""
-    from tai_accounts_postgres import service
+    from tai42_accounts_postgres import service
 
     monkeypatch.setattr(service, "users_store", lambda: users_store)
     monkeypatch.setattr(service, "sessions_store", lambda: sessions_store)

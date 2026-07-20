@@ -4,9 +4,9 @@ from __future__ import annotations
 
 import pytest
 
-from tai_accounts_postgres import rate_limit
-from tai_accounts_postgres.rate_limit import RateLimitedError, RateLimiter
-from tai_accounts_postgres.settings import AccountsSettings
+from tai42_accounts_postgres import rate_limit
+from tai42_accounts_postgres.rate_limit import RateLimitedError, RateLimiter
+from tai42_accounts_postgres.settings import AccountsSettings
 
 from .conftest import FakeRedis, make_redis_ctx
 

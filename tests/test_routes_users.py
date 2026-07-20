@@ -3,10 +3,10 @@
 from __future__ import annotations
 
 import pytest
-from tai_contract.access_control.context import set_request_user_id
+from tai42_contract.access_control.context import set_request_user_id
 
-from tai_accounts_postgres import routes_users, service
-from tai_accounts_postgres.hashing import hash_password
+from tai42_accounts_postgres import routes_users, service
+from tai42_accounts_postgres.hashing import hash_password
 
 from .conftest import build_request, future, response_json
 

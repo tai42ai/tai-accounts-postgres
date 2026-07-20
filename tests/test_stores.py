@@ -10,9 +10,9 @@ from __future__ import annotations
 
 import pytest
 
-from tai_accounts_postgres import stores
-from tai_accounts_postgres.settings import AccountsPgSettings
-from tai_accounts_postgres.stores import (
+from tai42_accounts_postgres import stores
+from tai42_accounts_postgres.settings import AccountsPgSettings
+from tai42_accounts_postgres.stores import (
     EmailTakenError,
     InvitesStore,
     SessionsStore,

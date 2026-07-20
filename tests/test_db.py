@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from tai_accounts_postgres import db
+from tai42_accounts_postgres import db
 
 from .conftest import ScriptedPg, make_pg_ctx
 

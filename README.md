@@ -1,4 +1,4 @@
-# tai-accounts-postgres
+# tai42-accounts-postgres
 
 [![CI](https://github.com/tai42ai/tai-accounts-postgres/actions/workflows/ci.yml/badge.svg)](https://github.com/tai42ai/tai-accounts-postgres/actions/workflows/ci.yml)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
@@ -8,17 +8,17 @@ plugin that owns human user accounts, password login, sessions, and invites, and
 ships a Studio users-admin UI. It registers itself as the `"accounts-postgres"`
 provider and mints/validates its own `tai-sess-…` session tokens.
 
-Importing the package registers the provider in `tai-contract`'s module-level
+Importing the package registers the provider in `tai42-contract`'s module-level
 accounts registry (`register_accounts_provider("accounts-postgres", ...)`), which
 ALSO lands the factory in the identity registry under the same name — an accounts
 provider is the token answerer for its own sessions, so one registration keeps
-sessions both mintable and validatable. No `tai_app` handle is involved, so it
+sessions both mintable and validatable. No `tai42_app` handle is involved, so it
 registers in any process that imports it. A deployment selects it by including
 `accounts-postgres` in the access-control `auth_providers` list.
 
-Its only tai-* dependencies are `tai-contract` (the accounts ABC, the injected
+Its only tai-* dependencies are `tai42-contract` (the accounts ABC, the injected
 admin-services and settings Protocols, the login-method metadata models, and the
-registry it registers through) and `tai-kit` (the Postgres and Redis clients and
+registry it registers through) and `tai42-kit` (the Postgres and Redis clients and
 the session/invite hash). It **never** imports the skeleton — the plugin is
 contract-facing, and the import is banned by ruff.
 
@@ -129,8 +129,8 @@ The plugin cannot ride the skeleton's `tai db` CLI (it never imports the
 skeleton), so it applies its own DDL:
 
 ```bash
-python -m tai_accounts_postgres.db apply     # create the three tables (idempotent)
-python -m tai_accounts_postgres.db tables     # list the tables the DDL declares
+python -m tai42_accounts_postgres.db apply     # create the three tables (idempotent)
+python -m tai42_accounts_postgres.db tables     # list the tables the DDL declares
 ```
 
 `apply` connects through `TAI_ACCOUNTS_PG_*`. The provider's boot healthcheck
@@ -146,10 +146,10 @@ services are never injected), boot fails loudly rather than serving a broken doo
 In the deployment manifest:
 
 ```yaml
-lifecycle_modules: ["tai_accounts_postgres"]                 # provider registration
-routers_modules: ["tai_accounts_postgres.routes_login",
-                  "tai_accounts_postgres.routes_users"]       # the HTTP surface
-studio_plugins: ["tai_accounts_postgres"]                    # the users-admin UI
+lifecycle_modules: ["tai42_accounts_postgres"]                 # provider registration
+routers_modules: ["tai42_accounts_postgres.routes_login",
+                  "tai42_accounts_postgres.routes_users"]       # the HTTP surface
+studio_plugins: ["tai42_accounts_postgres"]                    # the users-admin UI
 ```
 
 and in access control (example alongside the api-key provider):
@@ -186,7 +186,7 @@ the only place the raw invite link or session token appears.
 
 Requires **Python 3.13+**, a Postgres reachable through `TAI_ACCOUNTS_PG_*`, and a
 Redis reachable through the injected access-control Redis. Apply the schema with
-`python -m tai_accounts_postgres.db apply` before first serve; a missing schema is
+`python -m tai42_accounts_postgres.db apply` before first serve; a missing schema is
 caught loudly at boot.
 
 ## Install
@@ -197,7 +197,7 @@ editable dependency of the environment that runs the server:
 ```bash
 git clone https://github.com/tai42ai/tai-accounts-postgres
 cd tai-skeleton   # or your own app checkout
-uv add --editable ../tai-accounts-postgres    # once published: uv add tai-accounts-postgres
+uv add --editable ../tai-accounts-postgres    # once published: uv add tai42-accounts-postgres
 ```
 
 ## Development
@@ -210,7 +210,7 @@ uv run pyright
 uv run pytest
 ```
 
-`[tool.uv.sources]` resolves `tai-contract` and `tai-kit` from sibling checkouts
+`[tool.uv.sources]` resolves `tai42-contract` and `tai42-kit` from sibling checkouts
 for local development; the published wheel floors them from the index.
 
 ## License

@@ -1,10 +1,10 @@
 -- ============================================================
--- tai-accounts-postgres — accounts / sessions / invites schema
+-- tai42-accounts-postgres — accounts / sessions / invites schema
 -- ============================================================
 -- The plugin's OWN tables: human user accounts, their session tokens,
 -- and their pending invites. Single-tenant by design (no org_id /
 -- tenant column). This plugin owns and applies its own schema out-of-band via
--- its own apply step (`python -m tai_accounts_postgres.db apply`) — it rides no
+-- its own apply step (`python -m tai42_accounts_postgres.db apply`) — it rides no
 -- external migration tool. Every statement is IF NOT EXISTS, so re-running the
 -- script is a no-op.
 -- Database: tai (plugin-owned objects in the platform DB)

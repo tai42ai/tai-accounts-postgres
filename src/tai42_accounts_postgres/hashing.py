@@ -26,7 +26,7 @@ from collections.abc import Callable
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
 
-from tai_accounts_postgres.settings import accounts_settings
+from tai42_accounts_postgres.settings import accounts_settings
 
 logger = logging.getLogger(__name__)
 

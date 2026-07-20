@@ -22,14 +22,14 @@ from typing import Any
 from pydantic import BaseModel, ValidationError
 from starlette.requests import Request
 from starlette.responses import JSONResponse, Response
-from tai_contract.access_control import get_current_user_id
-from tai_contract.app import tai_app
+from tai42_contract.access_control import get_current_user_id
+from tai42_contract.app import tai42_app
 
-from tai_accounts_postgres import service
-from tai_accounts_postgres.hashing import HashCapacityError, hash_password_async, verify_password
-from tai_accounts_postgres.service import ADMIN_ROLE, SESSION_TOKEN_PREFIX
-from tai_accounts_postgres.settings import accounts_settings
-from tai_accounts_postgres.stores import EmailTakenError
+from tai42_accounts_postgres import service
+from tai42_accounts_postgres.hashing import HashCapacityError, hash_password_async, verify_password
+from tai42_accounts_postgres.service import ADMIN_ROLE, SESSION_TOKEN_PREFIX
+from tai42_accounts_postgres.settings import accounts_settings
+from tai42_accounts_postgres.stores import EmailTakenError
 
 logger = logging.getLogger(__name__)
 
@@ -124,7 +124,7 @@ def _presented_session_hash(request: Request) -> str | None:
     return None
 
 
-@tai_app.http.custom_route(
+@tai42_app.http.custom_route(
     "/api/auth/users",
     methods=["GET"],
     summary="List user accounts",
@@ -138,7 +138,7 @@ async def list_users(request: Request) -> Response:
     return JSONResponse({"data": {"users": [_serialize_user(row) for row in rows]}})
 
 
-@tai_app.http.custom_route(
+@tai42_app.http.custom_route(
     "/api/auth/users",
     methods=["POST"],
     summary="Create a user and mint an invite",
@@ -186,7 +186,7 @@ async def create_user(request: Request) -> Response:
     )
 
 
-@tai_app.http.custom_route(
+@tai42_app.http.custom_route(
     "/api/auth/users/me/password",
     methods=["PUT"],
     summary="Change your own password",
@@ -227,7 +227,7 @@ async def change_own_password(request: Request) -> Response:
     return JSONResponse({"data": {"changed": True}})
 
 
-@tai_app.http.custom_route(
+@tai42_app.http.custom_route(
     "/api/auth/users/{user_id}",
     methods=["PUT"],
     summary="Update a user's role or disabled state",
@@ -317,7 +317,7 @@ async def update_user(request: Request) -> Response:
     return JSONResponse({"data": {"user_id": user_id}})
 
 
-@tai_app.http.custom_route(
+@tai42_app.http.custom_route(
     "/api/auth/users/{user_id}",
     methods=["DELETE"],
     summary="Delete a user",
@@ -357,7 +357,7 @@ async def delete_user(request: Request) -> Response:
     return JSONResponse({"data": {"deleted": True, "user_id": user_id}})
 
 
-@tai_app.http.custom_route(
+@tai42_app.http.custom_route(
     "/api/auth/users/{user_id}/invite",
     methods=["POST"],
     summary="Regenerate a user's invite",

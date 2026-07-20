@@ -21,15 +21,15 @@ invite UPDATE, and the sessions⋈users JOIN — exercised against a live Postgr
 whose schema is applied via ``load_ddl()``; and the full request → middleware →
 provider integration. The end-to-end Studio-plugin LOAD (the users-admin page
 mounted from ``studio_plugins`` and reachable) is owned by the e2e stack IF it
-enables ``studio_plugins: ["tai_accounts_postgres"]``; this repo proves the UI
+enables ``studio_plugins: ["tai42_accounts_postgres"]``; this repo proves the UI
 through its own studio build + component tests. Absent that entry it stays a
 documented gap.
 """
 
 from __future__ import annotations
 
-from tai_accounts_postgres import stores
-from tai_accounts_postgres.db import load_ddl
+from tai42_accounts_postgres import stores
+from tai42_accounts_postgres.db import load_ddl
 
 
 def test_store_sql_names_match_the_ddl():

@@ -18,8 +18,8 @@ import os
 
 from pydantic import Field, SecretStr
 from pydantic_settings import SettingsConfigDict
-from tai_kit.clients import PostgresConnectionSettings
-from tai_kit.settings import TaiBaseSettings, settings_cache
+from tai42_kit.clients import PostgresConnectionSettings
+from tai42_kit.settings import TaiBaseSettings, settings_cache
 
 logger = logging.getLogger(__name__)
 

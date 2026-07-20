@@ -3,7 +3,7 @@ requires = ["setuptools>=77", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "tai-accounts-postgres"
+name = "tai42-accounts-postgres"
 version = "0.1.0"
 description = "Postgres-backed accounts provider for the TAI ecosystem: an installable plugin that owns user accounts, password login, sessions, and invites, registers itself as the \"accounts-postgres\" provider, and ships a Studio users-admin UI."
 readme = "README.md"
@@ -26,13 +26,13 @@ dependencies = [
     # The pure interface contract the provider registers through: the accounts
     # ABCs (AccountsProvider, AccountsAdminServices, AccountsProviderSettings),
     # the login-method metadata models, and the module-level accounts registry.
-    "tai-contract>=0.1,<0.2",
+    "tai42-contract>=0.1,<0.2",
     # The Postgres and Redis clients plus the session/invite token hash. The
     # `postgres` extra (psycopg[binary,pool]) backs the user/session/invite store;
     # the `redis` extra backs the login rate limiter and the shared bootstrap
     # token. Both are REQUIRED, not optional: the plugin's storage IS Postgres and
     # its throttle IS Redis, so both client modules must resolve for it to import.
-    "tai-kit[postgres,redis]>=0.1,<0.2",
+    "tai42-kit[postgres,redis]>=0.1,<0.2",
     # argon2id password hashing (RFC 9106 defaults, rehash-on-login).
     "argon2-cffi>=23",
 ]
@@ -60,16 +60,23 @@ package-dir = { "" = "src" }
 
 [tool.setuptools.packages.find]
 where = ["src"]
-include = ["tai_accounts_postgres*"]
+include = ["tai42_accounts_postgres*"]
 
 [tool.setuptools.package-data]
 # The packaged DDL (loaded by db.py at apply time) and the built Studio bundle
 # (served by the host) travel in the wheel alongside the typing marker.
-tai_accounts_postgres = ["py.typed", "sql/*.sql", "studio/*"]
+tai42_accounts_postgres = ["py.typed", "sql/*.sql", "studio/*"]
 
 [tool.uv]
 cache-keys = [{ file = "pyproject.toml" }]
 
+
+# The version floors in [project] are the compatibility contract; these path
+# sources resolve the sibling checkouts while the packages are unpublished.
+# They are not part of wheel metadata.
+[tool.uv.sources]
+tai42-contract = { path = "../tai-contract", editable = true }
+tai42-kit = { path = "../tai-kit", editable = true }
 [tool.ruff]
 src = ["src"]
 target-version = "py313"
@@ -79,7 +86,7 @@ line-length = 120
 select = ["E", "W", "F", "I", "UP", "B", "C4", "SIM", "PIE", "PT", "RUF", "TID"]
 
 [tool.ruff.lint.flake8-tidy-imports.banned-api]
-"tai_skeleton".msg = "tai-accounts-postgres is a contract-facing plugin: it never imports tai-skeleton."
+"tai42_skeleton".msg = "tai42-accounts-postgres is a contract-facing plugin: it never imports tai42-skeleton."
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -88,7 +95,7 @@ asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "function"
 
 [tool.coverage.run]
-source = ["tai_accounts_postgres"]
+source = ["tai42_accounts_postgres"]
 
 [tool.coverage.report]
 fail_under = 95

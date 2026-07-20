@@ -1,5 +1,5 @@
 /**
- * The tai-accounts-postgres Studio plugin front-end bundle.
+ * The tai42-accounts-postgres Studio plugin front-end bundle.
  *
  * Exports the `register(context)` entry that contributes the Users page and its
  * sidebar nav entry. The shared modules (react, react-dom, @tai42/studio-sdk) are

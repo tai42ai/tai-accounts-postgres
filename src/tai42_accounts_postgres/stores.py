@@ -18,11 +18,11 @@ from typing import TYPE_CHECKING, Any
 
 import psycopg
 from psycopg.rows import dict_row
-from tai_kit.clients import client_ctx
-from tai_kit.clients.impl.postgres import PostgresClient
+from tai42_kit.clients import client_ctx
+from tai42_kit.clients.impl.postgres import PostgresClient
 
 if TYPE_CHECKING:
-    from tai_accounts_postgres.settings import AccountsPgSettings
+    from tai42_accounts_postgres.settings import AccountsPgSettings
 
 # Bounded id-collision retry: an 8-byte opaque id colliding is astronomically
 # unlikely, so a small cap that then RAISES (never an unbounded loop) is correct.

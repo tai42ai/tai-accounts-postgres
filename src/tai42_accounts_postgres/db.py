@@ -4,8 +4,8 @@ This plugin owns the ``accounts_users`` / ``accounts_sessions`` / ``accounts_inv
 tables and applies their schema out-of-band through this module's entry point — it
 rides no external migration tool::
 
-    python -m tai_accounts_postgres.db apply    # create the three tables (idempotent)
-    python -m tai_accounts_postgres.db tables    # list the tables the DDL declares
+    python -m tai42_accounts_postgres.db apply    # create the three tables (idempotent)
+    python -m tai42_accounts_postgres.db tables    # list the tables the DDL declares
 
 Both connect through ``AccountsPgSettings`` (the ``TAI_ACCOUNTS_PG_*`` namespace)
 and run the packaged, trusted DDL through the kit ``PostgresClient`` pool.
@@ -19,10 +19,10 @@ import re
 from pathlib import Path
 from typing import LiteralString, cast
 
-from tai_kit.clients import client_ctx
-from tai_kit.clients.impl.postgres import PostgresClient
+from tai42_kit.clients import client_ctx
+from tai42_kit.clients.impl.postgres import PostgresClient
 
-from tai_accounts_postgres.settings import AccountsPgSettings
+from tai42_accounts_postgres.settings import AccountsPgSettings
 
 _RESOURCES_DIR = Path(__file__).resolve().parent / "sql"
 
@@ -74,8 +74,8 @@ def _tables_command() -> None:
 
 def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(
-        prog="python -m tai_accounts_postgres.db",
-        description="Apply and inspect the tai-accounts-postgres schema.",
+        prog="python -m tai42_accounts_postgres.db",
+        description="Apply and inspect the tai42-accounts-postgres schema.",
     )
     sub = parser.add_subparsers(dest="command", required=True)
     sub.add_parser("apply", help="Apply the packaged DDL to Postgres (idempotent).")

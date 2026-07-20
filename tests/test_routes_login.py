@@ -4,9 +4,9 @@ from __future__ import annotations
 
 import pytest
 
-from tai_accounts_postgres import rate_limit, routes_login, service
-from tai_accounts_postgres.hashing import DUMMY_HASH, HashCapacityError, hash_password
-from tai_accounts_postgres.settings import accounts_settings
+from tai42_accounts_postgres import rate_limit, routes_login, service
+from tai42_accounts_postgres.hashing import DUMMY_HASH, HashCapacityError, hash_password
+from tai42_accounts_postgres.settings import accounts_settings
 
 from .conftest import FakeRedis, build_request, future, response_json
 

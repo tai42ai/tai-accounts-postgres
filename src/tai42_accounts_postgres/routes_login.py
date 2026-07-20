@@ -1,6 +1,6 @@
 """Public login routes — the ``/api/login/*`` namespace.
 
-Registered through the bare ``@tai_app.http.custom_route`` decorator (``authed``
+Registered through the bare ``@tai42_app.http.custom_route`` decorator (``authed``
 is OpenAPI metadata only; runtime public-ness comes from the always-public
 ``/api/login`` prefix). Handlers take no settings argument: they reach
 ``settings.admin`` / ``settings.redis`` and the bootstrap token through
@@ -24,18 +24,18 @@ from datetime import UTC, datetime
 from pydantic import BaseModel, ValidationError
 from starlette.requests import Request
 from starlette.responses import JSONResponse, Response
-from tai_contract.app import tai_app
+from tai42_contract.app import tai42_app
 
-from tai_accounts_postgres import service
-from tai_accounts_postgres.hashing import (
+from tai42_accounts_postgres import service
+from tai42_accounts_postgres.hashing import (
     DUMMY_HASH,
     HashCapacityError,
     hash_password_async,
     needs_rehash,
     verify_password,
 )
-from tai_accounts_postgres.rate_limit import RateLimitedError, RateLimiter
-from tai_accounts_postgres.settings import accounts_settings
+from tai42_accounts_postgres.rate_limit import RateLimitedError, RateLimiter
+from tai42_accounts_postgres.settings import accounts_settings
 
 logger = logging.getLogger(__name__)
 
@@ -128,7 +128,7 @@ def _password_too_short(password: str) -> str | None:
     return None
 
 
-@tai_app.http.custom_route(
+@tai42_app.http.custom_route(
     "/api/login/password",
     methods=["POST"],
     summary="Log in with email and password",
@@ -183,7 +183,7 @@ async def login_password(request: Request) -> Response:
     return _session_response(raw, user["user_id"])
 
 
-@tai_app.http.custom_route(
+@tai42_app.http.custom_route(
     "/api/login/bootstrap",
     methods=["POST"],
     summary="Create the first owner account",
@@ -241,7 +241,7 @@ async def login_bootstrap(request: Request) -> Response:
     return _session_response(raw, owner_id)
 
 
-@tai_app.http.custom_route(
+@tai42_app.http.custom_route(
     "/api/login/invite/accept",
     methods=["POST"],
     summary="Accept an invite and set a password",
@@ -287,7 +287,7 @@ async def login_invite_accept(request: Request) -> Response:
     return _session_response(raw, user_id)
 
 
-@tai_app.lifecycle.on_startup
+@tai42_app.lifecycle.on_startup
 def _assert_accounts_provider_instantiated() -> None:
     """Fail boot loudly if the accounts routes are mounted but the provider was
     never instantiated — i.e. access control is disabled, so ``settings.admin`` was
@@ -297,7 +297,7 @@ def _assert_accounts_provider_instantiated() -> None:
     contradictory AC-disabled case."""
     if not service.provider_settings_populated():
         raise RuntimeError(
-            "tai-accounts-postgres routes are mounted but its provider was never instantiated — "
+            "tai42-accounts-postgres routes are mounted but its provider was never instantiated — "
             "the accounts kind requires ACCESS_CONTROL_ENABLE=true and 'accounts-postgres' present "
             "in ACCESS_CONTROL_AUTH_PROVIDERS"
         )

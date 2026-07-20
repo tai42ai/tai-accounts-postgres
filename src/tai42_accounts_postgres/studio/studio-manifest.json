@@ -1,5 +1,5 @@
 {
-  "name": "tai_accounts_postgres",
+  "name": "tai42_accounts_postgres",
   "version": "0.1.0",
   "api_version": 1,
   "entry": "tai-accounts-postgres-DaPjMraJ.js",

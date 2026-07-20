@@ -493,7 +493,7 @@ export function UsersPage(_props: PluginPageProps): ReactElement {
   })();
 
   return (
-    <div className="tai_accounts_postgres-root">
+    <div className="tai42_accounts_postgres-root">
       <div className="users-page">
         <div className="users-toolbar">
           <h1 className="users-toolbar-title">Users</h1>

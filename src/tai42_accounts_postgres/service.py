@@ -3,7 +3,7 @@
 Three concerns live here:
 
 - **The settings holder (module-level).** Route handlers register through the
-  bare ``@tai_app.http.custom_route`` decorator and take no settings argument, and
+  bare ``@tai42_app.http.custom_route`` decorator and take no settings argument, and
   the banned-api forbids importing the skeleton — so there is no ambient channel
   from a handler to the ``AccountsProviderSettings`` object (its ``.admin``
   services and ``.redis`` reach) the provider factory receives. The provider's
@@ -27,17 +27,17 @@ from collections.abc import Awaitable, Callable
 from datetime import UTC, datetime, timedelta
 from typing import TYPE_CHECKING, Any, cast
 
-from tai_kit.clients import RedisConnectionSettings, client_ctx
-from tai_kit.clients.impl.redis import RedisClient
-from tai_kit.utils.data.string_util import hash_api_key
+from tai42_kit.clients import RedisConnectionSettings, client_ctx
+from tai42_kit.clients.impl.redis import RedisClient
+from tai42_kit.utils.data.string_util import hash_api_key
 
-from tai_accounts_postgres.settings import accounts_settings
-from tai_accounts_postgres.stores import InvitesStore, SessionsStore, UsersStore, new_user_id
+from tai42_accounts_postgres.settings import accounts_settings
+from tai42_accounts_postgres.stores import InvitesStore, SessionsStore, UsersStore, new_user_id
 
 __all__ = ["new_user_id"]
 
 if TYPE_CHECKING:
-    from tai_contract.accounts import AccountsProviderSettings
+    from tai42_contract.accounts import AccountsProviderSettings
 
 logger = logging.getLogger(__name__)
 
@@ -76,7 +76,7 @@ def provider_settings() -> AccountsProviderSettings:
     """
     if _provider_settings is None:
         raise RuntimeError(
-            "tai-accounts-postgres settings holder is unpopulated: the provider was never "
+            "tai42-accounts-postgres settings holder is unpopulated: the provider was never "
             "instantiated. The accounts kind requires ACCESS_CONTROL_ENABLE=true and "
             "'accounts-postgres' present in ACCESS_CONTROL_AUTH_PROVIDERS."
         )
@@ -180,7 +180,7 @@ def too_many_attempts_message(retry_after: int) -> str:
 
 
 def _redis(redis_settings: Any) -> RedisConnectionSettings:
-    # tai-contract types the injected ``redis`` as ``Any``; kit's ``client_ctx``
+    # tai42-contract types the injected ``redis`` as ``Any``; kit's ``client_ctx``
     # takes a NOMINAL settings param, so cast the structural value at the bridge.
     return cast("RedisConnectionSettings", redis_settings)
 

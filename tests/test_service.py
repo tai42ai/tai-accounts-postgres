@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import pytest
 
-from tai_accounts_postgres import service
-from tai_accounts_postgres.settings import accounts_settings
+from tai42_accounts_postgres import service
+from tai42_accounts_postgres.settings import accounts_settings
 
 from .conftest import FakeAdminServices, FakeProviderSettings, FakeRedis, make_redis_ctx
 

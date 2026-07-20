@@ -25,11 +25,11 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, cast
 
-from tai_kit.clients import RedisConnectionSettings, client_ctx
-from tai_kit.clients.impl.redis import RedisClient
+from tai42_kit.clients import RedisConnectionSettings, client_ctx
+from tai42_kit.clients.impl.redis import RedisClient
 
 if TYPE_CHECKING:
-    from tai_accounts_postgres.settings import AccountsSettings
+    from tai42_accounts_postgres.settings import AccountsSettings
 
 
 class RateLimitedError(Exception):
@@ -48,7 +48,7 @@ class RateLimiter:
         self._settings = settings
 
     def _redis(self) -> RedisConnectionSettings:
-        # tai-contract types the injected ``redis`` as ``Any`` (it cannot name kit's
+        # tai42-contract types the injected ``redis`` as ``Any`` (it cannot name kit's
         # RedisConnectionSettings), and kit's ``client_ctx`` takes a NOMINAL settings
         # param, so cast the structural value at the single bridge point.
         return cast("RedisConnectionSettings", self._redis_settings)
