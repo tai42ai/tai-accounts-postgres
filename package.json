@@ -22,7 +22,7 @@
     "@types/react-dom": "^19.0.2",
     "@vitejs/plugin-react": "^4.3.4",
     "jsdom": "^25.0.1",
-    "postcss": "^8.5.1",
+    "postcss": "^8.5.20",
     "postcss-prefix-selector": "^2.1.1",
     "prettier": "^3.4.2",
     "react": "^19.0.0",
