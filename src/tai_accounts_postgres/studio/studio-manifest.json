@@ -1,0 +1,17 @@
+{
+  "name": "tai_accounts_postgres",
+  "version": "0.1.0",
+  "api_version": 1,
+  "entry": "tai-accounts-postgres-DaPjMraJ.js",
+  "integrity": {
+    "tai-accounts-postgres-BXH6VDWh.css": "sha384-HR9aWMPEbD7tOgKZFpvUCf9d+kpIvssbzpoo/tgoPQY+ZMAy2gNbzvUTmBNAB+At",
+    "tai-accounts-postgres-DaPjMraJ.js": "sha384-I9YusCjlCP1PPKkXwwKJVe3AS8pJlk5CEnRWV2dYEzW4pR+AK1o83pTpg3OMmU8e"
+  },
+  "contributions": {
+    "tool_panels": {},
+    "pages": [
+      "users"
+    ],
+    "settings_tabs": []
+  }
+}
