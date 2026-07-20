@@ -58,10 +58,6 @@ jobs:
           node-version: 22
           cache: pnpm
           cache-dependency-path: tai-accounts-postgres/pnpm-lock.yaml
-      # Build the tai-studio workspace so the linked SDK's declarations exist.
-      - name: Build studio workspace
-        working-directory: tai-studio
-        run: pnpm install --frozen-lockfile && pnpm -r build
       - name: Install deps
         working-directory: tai-accounts-postgres
         run: pnpm install --frozen-lockfile
