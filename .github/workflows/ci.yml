@@ -1,0 +1,114 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: tai-accounts-postgres
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          path: tai-accounts-postgres
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          repository: ${{ github.repository_owner }}/tai-contract
+          path: tai-contract
+          token: ${{ secrets.TAI_CI_TOKEN }}
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          repository: ${{ github.repository_owner }}/tai-kit
+          path: tai-kit
+          token: ${{ secrets.TAI_CI_TOKEN }}
+      - uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86 # v5.4.2
+        with:
+          version: "0.11.26"
+          enable-cache: true
+      - run: uv python install 3.13
+      # dev pulls the test/lint/type tooling; --locked asserts the committed
+      # uv.lock is current; --python pins the interpreter.
+      - run: uv sync --locked --python 3.13 --extra dev
+      - name: Ruff
+        run: uv run ruff check .
+      - name: Ruff format
+        run: uv run ruff format --check .
+      - name: Pyright
+        run: uv run pyright
+      - name: Pytest
+        run: uv run pytest --cov --cov-report=term-missing
+
+  studio:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          path: tai-accounts-postgres
+      - uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
+        with:
+          version: 11.9.0
+      - uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903 # v6.0.0
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: tai-accounts-postgres/pnpm-lock.yaml
+      - name: Install deps
+        working-directory: tai-accounts-postgres
+        run: pnpm install --frozen-lockfile
+      - name: Typecheck
+        working-directory: tai-accounts-postgres
+        run: pnpm typecheck
+      - name: Format check
+        working-directory: tai-accounts-postgres
+        run: pnpm run format:check
+      - name: Test
+        working-directory: tai-accounts-postgres
+        run: pnpm test
+      - name: Build Studio bundle
+        working-directory: tai-accounts-postgres
+        run: pnpm run build
+      # A stale committed bundle fails here: the freshly built output must equal
+      # what is checked in.
+      - name: Dist freshness
+        working-directory: tai-accounts-postgres
+        run: git diff --exit-code src/tai42_accounts_postgres/studio/
+
+  # Fan-out to the downstream integration-test suite: on a push to main, after
+  # `check` is green, this dispatches a repository_dispatch event carrying the
+  # pushed sha. Push-to-main only (never pull_request) so a fork PR cannot
+  # exfiltrate the dispatch token; the payload is built from literal args and
+  # github.sha, so no client-controlled value reaches it. The step is skipped
+  # when the dispatch token is not configured, so a fork -- or any clone without
+  # that secret -- runs green rather than failing on an unreachable target.
+  trigger-e2e:
+    needs: check
+    if: github.ref == 'refs/heads/main' && success()
+    runs-on: ubuntu-latest
+    # The dispatch authenticates with its own token, not GITHUB_TOKEN, so this
+    # job needs none of the default token's scopes.
+    permissions: {}
+    # Secrets cannot be read from a step-level `if`, so the token is lifted to a
+    # job-level env var that the step condition can test.
+    env:
+      E2E_DISPATCH_TOKEN: ${{ secrets.TAI_E2E_DISPATCH_TOKEN }}
+    steps:
+      - name: Dispatch ecosystem-push to the integration-test suite
+        if: env.E2E_DISPATCH_TOKEN != ''
+        env:
+          GH_TOKEN: ${{ env.E2E_DISPATCH_TOKEN }}
+        run: |
+          gh api repos/${{ github.repository_owner }}/tai-e2e/dispatches \
+            -f event_type=ecosystem-push \
+            -F client_payload[repo]=tai-accounts-postgres \
+            -F client_payload[ref]=${{ github.sha }}
