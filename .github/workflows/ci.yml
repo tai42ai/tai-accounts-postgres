@@ -48,6 +48,25 @@ jobs:
         run: uv run pyright
       - name: Pytest
         run: uv run pytest --cov --cov-report=term-missing
+      - name: Packaged descriptor
+        # The wheel is what users install, so build it and assert the plugin
+        # descriptor really travels inside it -- at the import path the loader
+        # reads, declaring the same version as the project metadata.
+        run: |
+          set -euo pipefail
+          uv build --wheel --out-dir dist
+          wheel=$(ls dist/*.whl)
+          version=$(uv run --no-sync python -c 'import pathlib, tomllib; print(tomllib.loads(pathlib.Path("pyproject.toml").read_text())["project"]["version"])')
+          descriptor=$(unzip -p "$wheel" tai42_accounts_postgres/tai-plugin.yml) || {
+            echo "::error::$wheel does not package tai42_accounts_postgres/tai-plugin.yml"
+            unzip -l "$wheel"
+            exit 1
+          }
+          printf '%s\n' "$descriptor" | grep -qx "version: $version" || {
+            echo "::error::$wheel packages a tai-plugin.yml that does not declare version: $version"
+            printf '%s\n' "$descriptor"
+            exit 1
+          }
 
   studio:
     runs-on: ubuntu-latest

@@ -3,8 +3,9 @@
 from __future__ import annotations
 
 import pytest
+from argon2 import PasswordHasher
 
-from tai42_accounts_postgres import rate_limit, routes_login, service
+from tai42_accounts_postgres import hashing, rate_limit, routes_login, service
 from tai42_accounts_postgres.hashing import DUMMY_HASH, HashCapacityError, hash_password
 from tai42_accounts_postgres.settings import accounts_settings
 
@@ -29,15 +30,37 @@ def _ctx(fake):
     return _cm()
 
 
-def _seed_user(wire, password: str, *, disabled=False, password_hash=None):
+# Distinguishes "caller passed no hash, derive one from the password" from an
+# explicit ``password_hash=None`` seeding a NULL hash (an un-accepted invite).
+_FROM_PASSWORD = object()
+
+
+def _seed_user(wire, password: str, *, disabled=False, password_hash=_FROM_PASSWORD):
     wire.users.rows["usr-1"] = {
         "user_id": "usr-1",
         "email": "a@b.c",
-        "password_hash": password_hash if password_hash is not None else hash_password(password),
+        "password_hash": hash_password(password) if password_hash is _FROM_PASSWORD else password_hash,
         "role": "admin",
         "disabled": disabled,
         "created_at": future(0),
     }
+
+
+def _stale_parameter_hash(password: str) -> str:
+    """Hash ``password`` with argon2 cost parameters weaker than the live ones.
+
+    Each cost is derived from the module's own hasher and lowered, so the result is
+    a hash that today's parameters consider outdated — ``check_needs_rehash`` says
+    True — while still verifying the password, since an argon2 hash carries the
+    parameters it was made with.
+    """
+    current = hashing._hasher
+    stale = PasswordHasher(
+        time_cost=max(1, current.time_cost - 1),
+        memory_cost=max(8 * current.parallelism, current.memory_cost // 2),
+        parallelism=max(1, current.parallelism - 1),
+    )
+    return stale.hash(password)
 
 
 def _account_key() -> str:
@@ -106,12 +129,26 @@ async def test_failed_attempt_trips_429_with_retry_after(wire, redis_fake):
     assert "Too many attempts" in response_json(resp)["error"]
 
 
-async def test_rehash_on_login(wire, redis_fake, monkeypatch):
-    _seed_user(wire, "correct-password")
-    old_hash = wire.users.rows["usr-1"]["password_hash"]
-    monkeypatch.setattr(routes_login, "needs_rehash", lambda h: True)
-    await routes_login.login_password(build_request({"email": "a@b.c", "password": "correct-password"}))
-    assert wire.users.rows["usr-1"]["password_hash"] != old_hash
+async def test_successful_login_leaves_the_stored_hash_untouched(wire, redis_fake):
+    """A password login only READS the stored hash; it never writes one back.
+
+    Verifying the password is the whole of the credential check — no re-hash, no
+    parameter upgrade, no write of any kind — so a successful login leaves the
+    stored ``password_hash`` byte-identical to the one the password was set with.
+
+    The stored hash is deliberately made with stale (weaker) argon2 parameters —
+    the one case a parameter upgrade would fire on — so this also fails if the
+    rewrite comes back guarded by a ``check_needs_rehash`` condition.
+    """
+    stored_hash = _stale_parameter_hash("correct-password")
+    assert hashing._hasher.check_needs_rehash(stored_hash) is True  # the premise of this test
+    _seed_user(wire, "correct-password", password_hash=stored_hash)
+
+    resp = await routes_login.login_password(build_request({"email": "a@b.c", "password": "correct-password"}))
+
+    # A 200 is proof the stale-parameter hash still verifies the password.
+    assert resp.status_code == 200
+    assert wire.users.rows["usr-1"]["password_hash"] == stored_hash
 
 
 async def test_disabled_user_401(wire, redis_fake):
@@ -122,6 +159,11 @@ async def test_disabled_user_401(wire, redis_fake):
 
 async def test_null_password_401(wire, redis_fake):
     _seed_user(wire, "unused", password_hash=None)
+    # The seeded row is what this test is about: a NULL hash, the un-accepted invite.
+    # A seeder that derived a hash from "unused" instead would still answer 401 here —
+    # the wrong password's 401, from a row that never had the shape under test — so the
+    # row is pinned directly rather than read back through the response.
+    assert wire.users.rows["usr-1"]["password_hash"] is None
     resp = await routes_login.login_password(build_request({"email": "a@b.c", "password": "anything"}))
     assert resp.status_code == 401
 

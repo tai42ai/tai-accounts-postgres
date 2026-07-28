@@ -24,7 +24,6 @@ from tai42_accounts_postgres.hashing import (
     DUMMY_HASH,
     HashCapacityError,
     hash_password_async,
-    needs_rehash,
     verify_password,
 )
 from tai42_accounts_postgres.rate_limit import RateLimitedError, RateLimiter
@@ -165,9 +164,6 @@ async def login_password(request: Request) -> Response:
 
     assert user is not None
     await _limiter().clear(email)
-    stored_hash = user["password_hash"]
-    if stored_hash is not None and needs_rehash(stored_hash):
-        await store.set_password_hash(user["user_id"], await hash_password_async(body.password))
     raw = await service.mint_session(user["user_id"])
     return _session_response(raw, user["user_id"])
 

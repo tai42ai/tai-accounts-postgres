@@ -8,10 +8,9 @@
 
 ## Checklist
 
-- [ ] Tests pass (`uv run pytest`)
-- [ ] Lint is clean (`uv run ruff check .`)
+- [ ] Tests pass (`uv run --no-sync pytest --cov --cov-report=term-missing`)
+- [ ] Lint is clean (`uv run --no-sync ruff check .`)
 - [ ] Studio types check (`pnpm typecheck`)
 - [ ] Studio formatting is clean (`pnpm run format:check`)
 - [ ] Studio tests pass (`pnpm test`)
 - [ ] Studio bundle rebuilt and committed (`pnpm run build`)
-- [ ] `CHANGELOG.md` updated under `## [Unreleased]`

@@ -10,7 +10,6 @@ from tai42_accounts_postgres.hashing import (
     HashCapacityError,
     HashGate,
     hash_password,
-    needs_rehash,
     verify_password,
 )
 
@@ -28,10 +27,6 @@ async def test_verify_mismatch_returns_false():
 
 async def test_dummy_hash_verify_is_false_but_real_work():
     assert await verify_password(DUMMY_HASH, "anything") is False
-
-
-def test_fresh_hash_needs_no_rehash():
-    assert needs_rehash(hash_password("x" * 12)) is False
 
 
 async def test_gate_sheds_when_saturated():

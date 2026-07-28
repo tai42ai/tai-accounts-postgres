@@ -161,8 +161,7 @@ ACCESS_CONTROL_AUTH_PROVIDERS=["accounts-postgres","redis"]
 
 ## Security model
 
-- **argon2id** password hashing (RFC 9106 library defaults), with
-  rehash-on-login so parameter upgrades propagate without a migration.
+- **argon2id** password hashing (RFC 9106 library defaults).
 - **Hashed at rest:** session and invite tokens are stored only as their SHA-256
   hash; the raw token appears exactly once, in the response that mints it.
 - **Uniform login failure:** unknown email and wrong password return a
@@ -191,27 +190,56 @@ caught loudly at boot.
 
 ## Install
 
-Nothing is on PyPI yet, so install from source — clone this repo and add it as an
-editable dependency of the environment that runs the server:
+Requires **Python 3.13+**. Install from PyPI into the environment that runs the
+server:
 
 ```bash
-git clone https://github.com/tai42ai/tai-accounts-postgres
-cd tai-skeleton   # or your own app checkout
-uv add --editable ../tai-accounts-postgres    # once published: uv add tai42-accounts-postgres
+uv add tai42-accounts-postgres
+```
+
+Or from source — clone this repo and add it as an editable dependency. Clone
+`tai-contract` and `tai-kit` beside this repo first — `[tool.uv.sources]`
+resolves them from sibling paths.
+
+```bash
+git clone https://github.com/tai42ai/tai-accounts-postgres   # next to your app checkout
+cd /path/to/your/app
+uv add --editable ../tai-accounts-postgres
 ```
 
 ## Development
 
+Two toolchains, one repo — CI gates both.
+
+**Python** (from the repo root):
+
 ```bash
-uv sync --extra dev
-uv run ruff check .
-uv run ruff format --check .
-uv run pyright
-uv run pytest
+uv venv --python 3.13
+uv pip install --no-sources --editable ".[dev]"
+uv run --no-sync ruff check .
+uv run --no-sync ruff format --check .
+uv run --no-sync pyright
+uv run --no-sync pytest --cov --cov-report=term-missing
 ```
 
-`[tool.uv.sources]` resolves `tai42-contract` and `tai42-kit` from sibling checkouts
-for local development; the published wheel floors them from the index.
+Coverage is gated at 95% (`fail_under` in `pyproject.toml`). CI installs with
+`uv sync --locked --python 3.13 --extra dev`, so a stale `uv.lock` fails there.
+
+**Studio bundle**:
+
+```bash
+pnpm install --frozen-lockfile
+pnpm typecheck
+pnpm run format:check
+pnpm test
+pnpm run build
+git diff --exit-code src/tai42_accounts_postgres/studio/
+```
+
+The last line is the freshness gate. After any change under `studio-src/` (or the
+JS toolchain), run `pnpm run build` and commit the regenerated
+`src/tai42_accounts_postgres/studio/` alongside the source — a stale committed
+bundle fails CI.
 
 ## License
 

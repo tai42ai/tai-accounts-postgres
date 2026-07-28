@@ -3,8 +3,8 @@
 argon2 hash/verify are synchronous CPU/memory-bound calls, run off the event loop
 under a semaphore; a request that cannot acquire a slot within the wait budget
 sheds with :class:`HashCapacityError` rather than queuing or running the hash.
-``verify`` returns a plain bool (mismatch is ``False``; other argon2 errors
-propagate). ``check_needs_rehash`` on each successful login upgrades parameters.
+:func:`verify_password` returns ``True`` on match and ``False`` on mismatch; any
+other argon2 error propagates.
 """
 
 from __future__ import annotations
@@ -43,11 +43,6 @@ async def hash_password_async(password: str) -> str:
     """Hash off the event loop. Ungated — the write paths that call it are gated or
     authed, not an unauthenticated flood vector like the login verify."""
     return await asyncio.to_thread(hash_password, password)
-
-
-def needs_rehash(hash_: str) -> bool:
-    """Whether ``hash_`` was made with parameters older than the current defaults."""
-    return _hasher.check_needs_rehash(hash_)
 
 
 def _verify_sync(hash_: str, password: str) -> bool:

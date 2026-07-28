@@ -33,7 +33,7 @@ dependencies = [
     # token. Both are REQUIRED, not optional: the plugin's storage IS Postgres and
     # its throttle IS Redis, so both client modules must resolve for it to import.
     "tai42-kit[postgres,redis]>=0.1,<0.2",
-    # argon2id password hashing (RFC 9106 defaults, rehash-on-login).
+    # argon2id password hashing (RFC 9106 defaults).
     "argon2-cffi>=23",
 ]
 
@@ -53,6 +53,8 @@ dev = [
     "pytest-cov>=5",
     "ruff>=0.6",
     "pyright>=1.1.389",
+    # The plugin-spec test parses tai-plugin.yml.
+    "pyyaml>=6",
 ]
 
 [tool.setuptools]
@@ -63,17 +65,18 @@ where = ["src"]
 include = ["tai42_accounts_postgres*"]
 
 [tool.setuptools.package-data]
-# The packaged DDL (loaded by db.py at apply time) and the built Studio bundle
-# (served by the host) travel in the wheel alongside the typing marker.
-tai42_accounts_postgres = ["py.typed", "sql/*.sql", "studio/*"]
+# The packaged DDL (loaded by db.py at apply time), the built Studio bundle
+# (served by the host), and the plugin spec travel in the wheel alongside the
+# typing marker.
+tai42_accounts_postgres = ["py.typed", "tai-plugin.yml", "sql/*.sql", "studio/*"]
 
 [tool.uv]
 cache-keys = [{ file = "pyproject.toml" }]
 
 
 # The version floors in [project] are the compatibility contract; these path
-# sources resolve the sibling checkouts while the packages are unpublished.
-# They are not part of wheel metadata.
+# sources point local development at the sibling checkouts instead of the
+# published packages. They are not part of wheel metadata.
 [tool.uv.sources]
 tai42-contract = { path = "../tai-contract", editable = true }
 tai42-kit = { path = "../tai-kit", editable = true }
