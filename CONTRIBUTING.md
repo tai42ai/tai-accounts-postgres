@@ -68,6 +68,8 @@ uv run --no-sync pytest --cov --cov-report=term-missing
 
 Coverage is gated at 95% (`fail_under` in `pyproject.toml`).
 
+`make dev` installs the sibling `tai-contract` and `tai-kit` repos as editable installs for local cross-repo development.
+
 The repo root is also a pnpm project — a single-package one holding the Studio
 plugin UI, whose sources live under `studio-src/`. Run its gates from the repo
 root:
