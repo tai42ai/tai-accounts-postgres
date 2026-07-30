@@ -146,17 +146,31 @@ jobs:
           PY
       - name: Refresh uv.lock
         run: uv lock
-      - name: Commit refreshed lockfile
+      # The committed studio bundle embeds the project version in its
+      # studio-manifest.json, and the spec test requires it to equal the
+      # pyproject version — so the release PR's version bump must rebuild the
+      # bundle here, exactly as it refreshes uv.lock above.
+      - uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
+        with:
+          version: 11.9.0
+      - uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903 # v6.0.0
+        with:
+          node-version: 22
+      - name: Rebuild the studio bundle at the release version
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm run build
+      - name: Commit refreshed lockfile and bundle
         env:
           BRANCH: ${{ fromJSON(needs.release-please.outputs.pr).headBranchName }}
         run: |
           set -euo pipefail
-          if git diff --quiet -- uv.lock; then
-            echo "uv.lock already in sync; nothing to commit."
+          git add -A -- uv.lock src/tai42_accounts_postgres/studio
+          if git diff --cached --quiet; then
+            echo "uv.lock and studio bundle already in sync; nothing to commit."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add uv.lock
-          git commit -m "chore: sync uv.lock for release"
+          git commit -m "chore: sync uv.lock and studio bundle for release"
           git push origin "HEAD:$BRANCH"
