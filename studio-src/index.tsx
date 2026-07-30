@@ -46,5 +46,10 @@ function UsersNavIcon(): ReactElement {
  */
 export function register(context: PluginContext): void {
   context.registerPage({ path: 'users', title: 'Users', component: UsersPage });
-  context.registerNavEntry({ path: 'users', title: 'Users', icon: UsersNavIcon });
+  context.registerNavEntry({
+    path: 'users',
+    title: 'Users',
+    icon: UsersNavIcon,
+    section: 'Administration',
+  });
 }

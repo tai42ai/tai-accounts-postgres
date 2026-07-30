@@ -407,7 +407,12 @@ function se() {
   );
 }
 function ce(n) {
-  n.registerPage({ path: "users", title: "Users", component: re }), n.registerNavEntry({ path: "users", title: "Users", icon: se });
+  n.registerPage({ path: "users", title: "Users", component: re }), n.registerNavEntry({
+    path: "users",
+    title: "Users",
+    icon: se,
+    section: "Administration"
+  });
 }
 export {
   ce as register
